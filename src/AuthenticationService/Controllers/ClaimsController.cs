@@ -19,6 +19,5 @@ namespace AuthenticationService.Controllers
             this.roleManager = roleManager;
             _userManager = userManager;
         }
-
     }
 }
