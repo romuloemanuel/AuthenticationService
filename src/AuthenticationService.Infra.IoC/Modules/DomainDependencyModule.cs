@@ -9,6 +9,7 @@ namespace AuthenticationService.Infra.IoC.Modules
         public static void Register(Container container)
         {
             container.Register<IIdentityUserService, IdentityUserService>(Lifestyle.Scoped);
+            container.Register<IClaimService, ClaimService>(Lifestyle.Scoped);
         }
     }
 }

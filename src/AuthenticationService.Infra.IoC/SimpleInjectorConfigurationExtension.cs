@@ -27,6 +27,7 @@ namespace AuthenticationService.Infra.IoC
         }
 
         public static Container GetContainer(this IApplicationBuilder app) => _container;
+        public static Container GetContainer() => _container;
 
         public static void UseSimpleInjectorConfig(this IApplicationBuilder app)
         {

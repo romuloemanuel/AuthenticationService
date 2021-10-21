@@ -1,12 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace AuthenticationService.Infra.Extensions
 {
@@ -15,6 +14,8 @@ namespace AuthenticationService.Infra.Extensions
 
         public static void AddJwtConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
+            IdentityModelEventSource.ShowPII = true;
+
             services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -35,6 +36,15 @@ namespace AuthenticationService.Infra.Extensions
                   (Encoding.UTF8.GetBytes(configuration["Jwt:Key"]))
                   };
               });
+
+            services.AddControllers(config =>
+            {
+                var policy = new AuthorizationPolicyBuilder()
+                                 .RequireAuthenticatedUser()
+                                 .Build();
+
+                config.Filters.Add(new AuthorizeFilter(policy));
+            });
         }
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 
 namespace AuthenticationService.Domain.Models
@@ -37,7 +38,9 @@ namespace AuthenticationService.Domain.Models
 
             SecurityToken securityToken = handler.CreateToken(new SecurityTokenDescriptor
             {
-                //Subject = user, //Claims
+                Subject = new ClaimsIdentity(new Claim[] {
+                new Claim("name","Rômulo")
+             }), //Claims
                 Issuer = issuer,
                 Audience = audience,
                 IssuedAt = DateTime.UtcNow, //Data/hora que o token foi gerado 

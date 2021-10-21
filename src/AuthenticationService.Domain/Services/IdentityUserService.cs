@@ -46,7 +46,7 @@ namespace AuthenticationService.Domain.Services
             if (user != null)
                 throw new Exception("Usuário já cadastrado");
 
-            var userIdentity = await _userManager.CreateAsync(user, userRequest.PasswordHash);
+            var userIdentity = await _userManager.CreateAsync(userRequest, userRequest.PasswordHash);
 
             if (!userIdentity.Succeeded)
                 throw new Exception("Erro ao criar usuário");
