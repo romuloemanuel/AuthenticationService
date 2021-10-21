@@ -13,6 +13,7 @@ namespace AuthenticationService.Infra.IoC
             DbContextDependencyModule.Register(container);
             AutoMapperDependencyModule.Register(container);
             UnitOfWorkDependencyModule.Register(container);
+            ValidatorsDependencyModule.Register(container);
         }
     }
 }

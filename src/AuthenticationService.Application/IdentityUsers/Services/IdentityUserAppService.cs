@@ -3,39 +3,49 @@ using AuthenticationService.Application.IdentityUsers.Requests;
 using AuthenticationService.Application.IdentityUsers.Responses;
 using AuthenticationService.Domain.Interfaces.Services;
 using System.Threading.Tasks;
-using AuthenticationService.Application.IdentityUsers.Validators;
 using System;
 using System.Linq;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using FluentValidation;
 
 namespace AuthenticationService.Application.IdentityUsers.Services
 {
     public class IdentityUserAppService : IIdentityUserAppService
     {
-        private IIdentityUserService _identityUserService;
-        private IMapper _mapper;
-        public IdentityUserAppService(IIdentityUserService identityUserService, IMapper mapper)
+        readonly IIdentityUserService _identityUserService;
+        readonly IMapper _mapper;
+        readonly IValidator<ChangePasswordRequest> _changePassworRequestValidator;
+        readonly IValidator<RegisterRequest> _registerRequestValidator;
+        readonly IValidator<LoginRequest> _loginRequestValidator;
+        public IdentityUserAppService(
+            IIdentityUserService identityUserService, IMapper mapper,
+            IValidator<ChangePasswordRequest> changePassworRequestValidator,
+            IValidator<RegisterRequest> registerRequestValidator,
+            IValidator<LoginRequest> loginRequestValidator)
         {
             _identityUserService = identityUserService;
             _mapper = mapper;
+            _changePassworRequestValidator = changePassworRequestValidator;
+            _registerRequestValidator = registerRequestValidator;
+            _loginRequestValidator = loginRequestValidator;
         }
 
-        public async Task ChangePasswordAsync(ChangePasswordRequest chancePasswordRequest )
+        public async Task ChangePasswordAsync(ChangePasswordRequest chancePasswordRequest)
         {
-            var validator = new ChangePasswordRequestValidator().Validate(chancePasswordRequest);
-            
+            var validator = _changePassworRequestValidator.Validate(chancePasswordRequest);
+
             if (!validator.IsValid)
                 throw new Exception(validator.Errors.FirstOrDefault().ErrorMessage);
 
             var identityUser = _mapper.Map<IdentityUser>(chancePasswordRequest);
 
-            await _identityUserService.ChangePasswordAsync(identityUser,chancePasswordRequest.NewPassword);
+            await _identityUserService.ChangePasswordAsync(identityUser, chancePasswordRequest.NewPassword);
         }
 
         public async Task CreateAsync(RegisterRequest registerRequest)
         {
-            var validator = new RegisterRequestValidator().Validate(registerRequest);
+            var validator = _registerRequestValidator.Validate(registerRequest);
 
             if (!validator.IsValid)
                 throw new Exception(validator.Errors.FirstOrDefault().ErrorMessage);
@@ -47,7 +57,7 @@ namespace AuthenticationService.Application.IdentityUsers.Services
 
         public async Task<TokenResponse> LoginAsync(LoginRequest loginRequest)
         {
-            var validator = new LoginRequestValidator().Validate(loginRequest);
+            var validator = _loginRequestValidator.Validate(loginRequest);
 
             if (!validator.IsValid)
                 throw new Exception(validator.Errors.FirstOrDefault().ErrorMessage);
@@ -61,7 +71,7 @@ namespace AuthenticationService.Application.IdentityUsers.Services
 
         public async Task LogoutAsync()
         {
-           await  _identityUserService.LogoutAsync();
+            await _identityUserService.LogoutAsync();
         }
     }
 }
